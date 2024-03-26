@@ -1,21 +1,32 @@
+# loading data and config
 import csv
-import datetime
 import yaml
 
+# for making ISO datetime strings for GIS
+import datetime
+
+# makes geolocating a given place a one-and-done affair
+from functools import lru_cache
+
+# for graphics
 import matplotlib.pyplot as plt
 
+# for exporting result to GIS
 import geopandas as gpd
 from shapely import Point
 
+yaml_file = open("config.yaml")
+CONFIG = yaml.safe_load(yaml_file)
+yaml_file.close()
 
-
-CSV_FILE = "Fraser Compass Card History - Aug-25-2023 to Mar-03-2024.csv"
-CONFIG = yaml.load_all("config.yaml", yaml.BaseLoader)
-
-STOPS_FILE = "stops.txt"
+STOPS_FILE = CONFIG["files"]["stops"]
 
 class Place():
-    def __init__(self, stop_code, proper_name, lat, long) -> None:
+    def __init__(self, stop_code, stop_id, proper_name, lat, long) -> None:
+        # stop_id field included to be able to block stat calculation 
+        # of taps at hidden stations since all tappable places have a stop_id
+        self.stop_id = stop_id
+
         self.stop_code = stop_code
         self.proper_name = proper_name
         self.lat = lat
@@ -41,8 +52,8 @@ def load_stops():
 
 STOPS_LIST = load_stops()
 
-def load_tap_list():
-    csv_file = open(CSV_FILE)
+def load_tap_list(file_name):
+    csv_file = open(file_name)
     dr = csv.DictReader(csv_file)
 
     t_list = []
@@ -59,36 +70,51 @@ def load_tap_list():
     return t_list
 
 # given a stop number or station name, return a Place object
+@lru_cache(maxsize=128)
 def geolocate_place(name) -> Place:
-    # if it's a bus stuff tap-in then try to use parent station or something
-    proper_name = ""
-    lat = None
-    long = None
-
     # we're dealing with a bus tap-in
     if "Bus" in name:
         stop_code = name.split("Bus Stop ")[1]
-        
+
+        stop_id = STOPS_LIST[stop_code]["stop_id"]
         proper_name = STOPS_LIST[stop_code]["stop_name"]
         lat = STOPS_LIST[stop_code]["stop_lat"]
         long = STOPS_LIST[stop_code]["stop_lon"]
 
-        place = Place(stop_code, proper_name, lat, long)
-    else:
-        pass
+        place = Place(stop_code, stop_id, proper_name, lat, long)
+        return place
+    # we're dealing with a station tap
+    elif "Stn" in name or "Station" in name:
+        station_name = name.split(" ")[0]
+        for s, v in STOPS_LIST.items():
+            # stations don't have stop_codes, so don't do anything until we find one without a stop_code
+            # exception added for WCE stations, which have stop_codes and stop_ids but are not bus stops
+            if v["stop_code"] != "" and "WCE" not in v["zone_id"]:
+                continue
+            i = v["stop_name"].find(station_name)
+            
+            if i == -1:
+                continue
 
-    return place
+            place = Place(stop_code=None, stop_id=v["stop_id"], proper_name=v["stop_name"], lat=v["stop_lat"], long=v["stop_lon"])
+            return place
+        else:
+            print(f"Couldn't find {name} station!")
+            return Place(-1, -1, "N/A", 0, 0)
+    else:
+        print(f"Don't know how to parse {name}! (couldn't classify it as a bus stop or station)")
+        return Place(-1, -1, "N/A", 0, 0)
 
 # given a "Transaction" string, return the action, place, and geometry
 def get_action_and_place(s: str) -> tuple[str, Place]:
     split = s.split(" at ")
 
-    # no reasonable place to put a missed tap out, discard it
+    # no reasonable place to put a missed tap out, put it at point null
     if s == "Missing Tap out":
-        return ("Missed Tap Out", "N/A", Point(0, 0))
+        return ("Missed Tap Out", Place(None, None, "N/A", lat=0, long=0))
     # purchased card at the translink customer service centre, use that location
     elif "Purchase" in s and "WalkIn Centre" in s:
-        return ("Purchase", "Customer Service Centre", Point(-123.11171, 49.28557))
+        return ("Purchase", Place(None, None, "Customer Service Centre", lat=49.28557, long=-123.11171))
     
     place: Place = geolocate_place(split[1])
 
@@ -97,16 +123,56 @@ def get_action_and_place(s: str) -> tuple[str, Place]:
  
 def calculate_stats(tap_list):
     stats = {}
-    stats["General"] = {}
-    stats["spatial"] = []
+    # summary of all the things that you've done
+    stats["actions"] = {}
+    # taps but with proper actions and Place objects
+    stats["refined-taps"] = []
+    # summary of money spent, refunded, etc.
+    stats["money"] = {}
+    # a geodataframe
+    stats["gdf"] = gpd.GeoDataFrame()
 
     for t in tap_list:
         # find place_name then interact with favouriteplaces dict
-        action_place_geom = get_action_and_place(t["Transaction"])
+        action, place = get_action_and_place(t["Transaction"])
 
-        pass
-    pass
+        # a stop_id of -1 indicates a failure to find the place
+        if place.stop_id == -1:
+            continue
+        # don't add hidden places to stats!
+        elif place.stop_id and place.stop_id in str(CONFIG["hidden-places"]):
+            continue
 
-t = load_tap_list()
-stats = calculate_stats(t)
+        # if action hasn't been added yet, this will add it with a value of 0
+        # if it has been added, it will return the value of the key (which is thrown out)
+        stats["actions"].setdefault(action, 0)
+        stats["actions"][action] += 1
 
+        # create a refined tap with more useful fields
+        new_tap = t
+
+        new_tap["datetime"] = t["DateTime"].isoformat()
+        new_tap["action"] = action
+
+        new_tap["stop_id"] = place.stop_id
+        new_tap["stop_code"] = place.stop_code
+        new_tap["proper_name"] = place.proper_name
+
+        new_tap["lat"] = place.lat
+        new_tap["long"] = place.long
+        
+        stats["refined-taps"].append(new_tap)
+
+    return stats
+
+csv_files = CONFIG["files"]["csv"]
+
+all_stats = {}
+
+for c_f in csv_files:
+    taps = load_tap_list(c_f)
+    stats = calculate_stats(taps)
+    all_stats[c_f] = stats
+
+    # TODO: remove eventually
+    print(f"{c_f}: {stats['actions']}")

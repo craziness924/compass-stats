@@ -1,0 +1,22 @@
+# array of "stop_id" (found in stops.txt) that will be excluded from the stats output,
+# useful if you don't want anyone knowing that you ride the 143 and not the 144 :)
+# will also exclude these locations from the numerical statistics
+#
+# CAUTION: Don't forget to hide all bus bays if you want to hide a whole bus exchange -
+# for example, Lougheed's 10 bus bays all have different stop_id values
+# West Coast Express station taps are also tricky - ensure you add all of them (may be fixed soon w/ parent station field)
+hidden-places:
+  [
+    # 1877, # sfu transportation centre bay 1 
+    # 99945 # new westminster skytrain station
+  ]
+
+files: 
+  # the Compass Card CSV export files of interest,
+  # the program will process all csv files given here at once
+  csv: [
+    "Fraser Compass Card History - Aug-25-2023 to Mar-03-2024.csv", 
+    "Simon Compass Card History - Aug-01-2023 to Mar-04-2024.csv", 
+      ]
+  # Translink's stops.txt file from the published GTFS
+  stops: "stops.txt"
