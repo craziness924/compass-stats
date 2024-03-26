@@ -131,13 +131,17 @@ def calculate_stats(tap_list):
     stats["actions"] = {}
     # taps but with proper actions and Place objects
     stats["refined-taps"] = []
+    # all taps in a journey into a nice neat array
+    stats["journeys"] = {}
+    # breakdown of actions in each place
+    stats["place-breakdown"] = {}
     # summary of money spent, refunded, etc.
     stats["money"] = {}
     # a geodataframe
     stats["gdf"] = gpd.GeoDataFrame()
 
     for t in tap_list:
-        # find place_name then interact with favouriteplaces dict
+        # find action and create Place object of tap
         action, place = get_action_and_place(t["Transaction"])
 
         # a stop_id of -1 indicates a failure to find the place
@@ -152,7 +156,7 @@ def calculate_stats(tap_list):
         stats["actions"].setdefault(action, 0)
         stats["actions"][action] += 1
 
-        # create a refined tap with more useful fields
+        # create a refined tap list with more useful fields
         new_tap = t
 
         new_tap["datetime"] = t["DateTime"].isoformat()
@@ -167,6 +171,41 @@ def calculate_stats(tap_list):
         
         stats["refined-taps"].append(new_tap)
 
+        # setup journeys
+
+        # "loaded" and "purchased" action doesn't have a JourneyId associated, ignore it
+        if action not in ["Loaded", "Purchase"]:
+            stats["journeys"].setdefault(t["JourneyId"], [])
+            stats["journeys"][t["JourneyId"]].append(new_tap)
+
+        # setup place breakdown
+        stats["place-breakdown"].setdefault(place.proper_name, {})
+        stats["place-breakdown"][place.proper_name].setdefault(action, 0)
+
+        stats["place-breakdown"][place.proper_name][action] += 1 
+
+        # setup money stats
+        stats["money"].setdefault("spent", 0)
+        stats["money"].setdefault("loaded", 0)
+
+        amnt = t["Amount"].split("$")
+        if amnt[0] == "-":
+            amnt = -1*float(amnt[1])
+        else:
+            amnt = float(amnt[1])
+
+        # spent amounts are expressed as negative in the Compass csv export
+        if amnt < 0:
+            stats["money"]["spent"] += amnt*-1
+        if amnt > 0:
+            # money was genuinely loaded via payment
+            if action == "Purchase" or action == "Loaded":
+                stats["money"]["loaded"] += amnt
+            # money was refunded for a trip at tap out time
+            # this is necessary because Compass reserves money for full trip ahead of time
+            elif action == "Tap out":
+                stats["money"]["spent"] += -amnt
+                pass
     return stats
 
 csv_files = CONFIG["files"]["csv"]
@@ -179,4 +218,4 @@ for c_f in csv_files:
     all_stats[c_f] = stats
 
     # TODO: remove eventually
-    print(f"{c_f}: {stats['actions']}")
+    print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
