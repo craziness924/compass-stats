@@ -76,15 +76,19 @@ def geolocate_place(name) -> Place:
     if "Bus" in name:
         stop_code = name.split("Bus Stop ")[1]
 
-        stop_id = STOPS_LIST[stop_code]["stop_id"]
-        proper_name = STOPS_LIST[stop_code]["stop_name"]
-        lat = STOPS_LIST[stop_code]["stop_lat"]
-        long = STOPS_LIST[stop_code]["stop_lon"]
+        try:
+            stop_id = STOPS_LIST[stop_code]["stop_id"]
+            proper_name = STOPS_LIST[stop_code]["stop_name"]
+            lat = STOPS_LIST[stop_code]["stop_lat"]
+            long = STOPS_LIST[stop_code]["stop_lon"]
 
-        place = Place(stop_code, stop_id, proper_name, lat, long)
+            place = Place(stop_code, stop_id, proper_name, lat, long)
+        except KeyError:
+            print(f"Error finding {name}! (couldn't find stop_code in stops.txt)")
+            place = Place(-1, -1, "N/A", lat=0, long=0)
         return place
     # we're dealing with a station tap
-    elif "Stn" in name or "Station" in name:
+    elif "Stn" in name or "Station" or "Quay" in name:
         station_name = name.split(" ")[0]
         for s, v in STOPS_LIST.items():
             # stations don't have stop_codes, so don't do anything until we find one without a stop_code
