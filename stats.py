@@ -8,12 +8,12 @@ import datetime
 # makes geolocating a given place a one-and-done affair
 from functools import lru_cache
 
-# for graphics
-import matplotlib.pyplot as plt
-
 # for exporting result to GIS
 import geopandas as gpd
 from shapely import Point
+
+# for plots
+from plots import plot_stats
 
 yaml_file = open("config.yaml")
 CONFIG = yaml.safe_load(yaml_file)
@@ -219,3 +219,5 @@ for c_f in csv_files:
 
     # TODO: remove eventually
     print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
+
+    plot_stats(stats)
