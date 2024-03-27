@@ -1,6 +1,7 @@
 .vscode
+__pycache__
 
 .venv
 *.csv
 *.geojson
-__pycache__
+config.yaml
