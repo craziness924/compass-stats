@@ -1,3 +1,6 @@
+.vscode
+
 .venv
 *.csv
+*.geojson
 __pycache__

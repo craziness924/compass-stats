@@ -9,6 +9,9 @@ hidden-places:
   [
     # 1877, # sfu transportation centre bay 1 
     # 99945 # new westminster skytrain station
+    10092,
+    8685,
+    3521
   ]
 
 files: 
@@ -18,7 +21,7 @@ files:
   # CAUTION: The default export file name includes your Compass card number, be careful!
   csv: [
     "data/Fraser Compass Card History - Aug-25-2023 to Mar-03-2024.csv", 
-    "data/Simon Compass Card History - Aug-25-2023 to Mar-03-2024.csv", 
+    "data/Simon Compass Card History - Aug-31-2023 to Mar-25-2024.csv"
       ]
   # Translink's stops.txt file from the published GTFS
   stops: "data/stops.txt"

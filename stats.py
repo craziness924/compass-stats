@@ -129,7 +129,7 @@ def calculate_stats(tap_list):
     stats = {}
     # summary of all the things that you've done
     stats["actions"] = {}
-    # taps but with proper actions and Place objects
+    # taps but with proper actions and coordinates
     stats["refined-taps"] = []
     # all taps in a journey into a nice neat array
     stats["journeys"] = {}
@@ -137,8 +137,10 @@ def calculate_stats(tap_list):
     stats["place-breakdown"] = {}
     # summary of money spent, refunded, etc.
     stats["money"] = {}
-    # a geodataframe
-    stats["gdf"] = gpd.GeoDataFrame()
+    # a geodataframe (eventually)
+    stats["gdf"] = None
+    # the geometry for the gdf we'll eventually make
+    gdf_geom = []
 
     for t in tap_list:
         # find action and create Place object of tap
@@ -168,6 +170,8 @@ def calculate_stats(tap_list):
 
         new_tap["lat"] = place.lat
         new_tap["long"] = place.long
+
+        gdf_geom.append(place.geometry)
         
         stats["refined-taps"].append(new_tap)
 
@@ -206,6 +210,8 @@ def calculate_stats(tap_list):
             elif action == "Tap out":
                 stats["money"]["spent"] += -amnt
                 pass
+    stats["gdf"] = gpd.GeoDataFrame(data=stats["refined-taps"], geometry=gdf_geom, crs="EPSG:4326")
+    print(stats["gdf"].head())
     return stats
 
 csv_files = CONFIG["files"]["csv"]
@@ -217,7 +223,9 @@ for c_f in csv_files:
     stats = calculate_stats(taps)
     all_stats[c_f] = stats
 
-    # TODO: remove eventually
-    print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
+   # stats["gdf"].to_file(f"{c_f}.geojson")
+
+    # # TODO: remove eventually
+    # print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
 
     plot_stats(stats)
