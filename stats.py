@@ -161,7 +161,7 @@ def calculate_stats(tap_list):
         # create a refined tap list with more useful fields
         new_tap = t
 
-        new_tap["datetime"] = t["DateTime"].isoformat()
+        new_tap["iso-datetime"] = t["DateTime"].isoformat()
         new_tap["action"] = action
 
         new_tap["stop_id"] = place.stop_id
@@ -223,9 +223,14 @@ for c_f in csv_files:
     stats = calculate_stats(taps)
     all_stats[c_f] = stats
 
-   # stats["gdf"].to_file(f"{c_f}.geojson")
 
     # # TODO: remove eventually
-    # print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
+    print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
 
-    plot_stats(stats)
+    if (CONFIG["outputs"]["save_geojson"]):
+        stats["gdf"].to_file(f"{c_f}.geojson")
+    # if (CONFIG["outputs"]["save_csv"]):
+    #     stats["gdf"].drop(["DateTime"], axis=1)
+    #     stats["gdf"].to_file(f"{c_f}-stats.csv")
+    if (CONFIG["outputs"]["show_plots"]):
+        plot_stats(stats, CONFIG)

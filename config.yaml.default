@@ -22,3 +22,9 @@ files:
       ]
   # Translink's stops.txt file from the published GTFS
   stops: "data/stops.txt"
+
+  outputs:
+    save_geojson: true
+    save_csv: true
+    show_plots: true
+    save_plots: true
