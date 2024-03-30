@@ -1,3 +1,6 @@
+# for making better output file names
+import os.path
+
 # loading data and config
 import csv
 import yaml
@@ -8,8 +11,9 @@ import datetime
 # makes geolocating a given place a one-and-done affair
 from functools import lru_cache
 
-# for exporting result to GIS
+# for exporting results to GIS and spreadsheets
 import geopandas as gpd
+import pandas as pd
 from shapely import Point
 
 # for plots
@@ -59,7 +63,8 @@ def load_tap_list(file_name):
     t_list = []
 
     for t in dr:
-        t["DateTime"] = datetime.datetime.strptime(t["DateTime"], "%b-%d-%Y %I:%M %p")
+    #     t["py_datetime"] = datetime.datetime.strptime(t["DateTime"], "%b-%d-%Y %I:%M %p")
+
         
         # could add a timezone but then DST must be accounted for :(
         # t["DateTime"].tzinfo.utcoffset("-7")
@@ -71,7 +76,7 @@ def load_tap_list(file_name):
 
 # given a stop number or station name, return a Place object
 @lru_cache(maxsize=128)
-def geolocate_place(name) -> Place:
+def geolocate_place(name: str) -> Place:
     # we're dealing with a bus tap-in
     if "Bus" in name:
         stop_code = name.split("Bus Stop ")[1]
@@ -90,14 +95,30 @@ def geolocate_place(name) -> Place:
     # we're dealing with a station tap
     elif "Stn" in name or "Station" or "Quay" in name:
         station_name = name.split(" ")[0]
+        
+        if "Port" in name:
+            station_name += f" {name.split(' ')[1]}"
+
+            # Moody Centre's WCE station is called Port Moody and 
+            # there's no Port Moody in stops.txt
+            if station_name == "Port Moody":
+                station_name = "Moody Centre"
+
         for s, v in STOPS_LIST.items():
-            # stations don't have stop_codes, so don't do anything until we find one without a stop_code
-            # exception added for WCE stations, which have stop_codes and stop_ids but are not bus stops
-            if v["stop_code"] != "" and "WCE" not in v["zone_id"]:
+            # train station type locations (including Lonsdale Quay) have a location_type of 1
+            # buses use location_type 0
+            if v["location_type"] != "1":
                 continue
+
             i = v["stop_name"].find(station_name)
             
+            # no match in stop_name so not the correct place
             if i == -1:
+                continue
+            
+            # indicates we're at a bus bay/platform/WCE version of a train station
+            # skip it and continue to the just train one
+            if v["parent_station"] != '':
                 continue
 
             place = Place(stop_code=None, stop_id=v["stop_id"], proper_name=v["stop_name"], lat=v["stop_lat"], long=v["stop_lon"])
@@ -160,8 +181,10 @@ def calculate_stats(tap_list):
 
         # create a refined tap list with more useful fields
         new_tap = t
+        
+        py_dt = datetime.datetime.strptime(t["DateTime"], "%b-%d-%Y %I:%M %p")
+        new_tap["iso-datetime"] = py_dt.isoformat()
 
-        new_tap["iso-datetime"] = t["DateTime"].isoformat()
         new_tap["action"] = action
 
         new_tap["stop_id"] = place.stop_id
@@ -211,7 +234,6 @@ def calculate_stats(tap_list):
                 stats["money"]["spent"] += -amnt
                 pass
     stats["gdf"] = gpd.GeoDataFrame(data=stats["refined-taps"], geometry=gdf_geom, crs="EPSG:4326")
-    print(stats["gdf"].head())
     return stats
 
 csv_files = CONFIG["files"]["csv"]
@@ -225,12 +247,23 @@ for c_f in csv_files:
 
 
     # # TODO: remove eventually
-    print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
+    # print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
 
+    OUTPUT_DIR = CONFIG["output_dir"]
+
+    # remove original directory of data file from filename
+    output_name = os.path.split(c_f)[1]
+    # remove extension of original filename
+    output_name = os.path.splitext(output_name)[0]
+    
+    output_name = os.path.join(OUTPUT_DIR, output_name)
+
+    os.makedirs(OUTPUT_DIR, exist_ok=True)
+    
     if (CONFIG["outputs"]["save_geojson"]):
-        stats["gdf"].to_file(f"{c_f}.geojson")
-    # if (CONFIG["outputs"]["save_csv"]):
-    #     stats["gdf"].drop(["DateTime"], axis=1)
-    #     stats["gdf"].to_file(f"{c_f}-stats.csv")
+        stats["gdf"].to_file(f"{output_name}.geojson")
+    if (CONFIG["outputs"]["save_csv"]):
+        buh: pd.DataFrame = stats["gdf"].drop("geometry", axis=1)
+        buh.to_csv(f"{output_name}-taps.csv", index=False)
     if (CONFIG["outputs"]["show_plots"]):
         plot_stats(stats, CONFIG)

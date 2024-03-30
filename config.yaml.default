@@ -7,7 +7,7 @@
 # West Coast Express station taps are also tricky - ensure you add all of them (may be fixed soon w/ parent station field)
 hidden-places:
   [
-    # 1877, # sfu transportation centre bay 1 
+    # 1877, # sfu transportation centre @ bay 1 
     # 99945 # new westminster skytrain station
   ]
 
@@ -28,3 +28,5 @@ files:
     save_csv: true
     show_plots: true
     save_plots: true
+
+  output_dir: "output"

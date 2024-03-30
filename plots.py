@@ -1,16 +1,22 @@
 # for graphics
 import matplotlib.pyplot as plt
+from matplotlib.axes import Axes
 
 def plot_stats(stats, CONFIG):
-    fig, (action_bars, place_bars) = plt.subplots(ncols=1, nrows=2)
+    fig, axes = plt.subplots(ncols=2, nrows=2)
 
-    fig.tight_layout(pad=5)
+
+    action_bars: Axes = axes[0][1]
+    place_bars: Axes = axes[0][0]
+
+    b: Axes = axes[0][0]
+    c: Axes = axes[1][0]
 
     actions, action_nums = stats["actions"].keys(), stats["actions"].values()
 
     tap_count = stats["actions"].get("Tap in", 0)+ stats["actions"].get("Tap out", 0) + stats["actions"].get("Transfer", 0)
-    # subtract 1 for Customer Service Centre
-    place_count = len(stats["place-breakdown"])-1
+    
+    place_count = len(stats["place-breakdown"])
 
     load_count = stats["actions"].get("Loaded", 0)
     load_amount = stats["money"]["loaded"]
@@ -22,7 +28,9 @@ def plot_stats(stats, CONFIG):
              \n\nYour card was loaded {load_count} times (${load_amount:.2f}) and \
              \nyou spent ${spent_amount:.2f} on fares")
     
-    action_bars.bar(x=list(actions), height=list(action_nums))
+    action_bars.bar(x=list(actions), height=list(action_nums),)
+    plt.title("Action Breakdown")
+    plt.grid(visible=True, which="both", axis="y")
 
     # bar chart of favourite places
 
@@ -42,7 +50,11 @@ def plot_stats(stats, CONFIG):
     sorted_labels = sorted(action_count_place_breakdown, reverse=True, key=action_count_place_breakdown.get)
     
     place_bars.bar(x=sorted_labels, height=sorted_counts)
-    plt.xticks(rotation=90)
-    plt.grid(visible=True, which="both", axis="y")
+    place_bars.set_title("Favourite Places by Action Count\n(excluding Purchasing and Loading)")
+
+    plt.xticks(rotation=45, ha="right")
+    place_bars.grid(visible=True, which="both", axis="y")
+    
+    #plt.tight_layout(w_pad=-0.1)
 
     plt.show()
