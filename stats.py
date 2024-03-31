@@ -265,5 +265,8 @@ for c_f in csv_files:
     if (CONFIG["outputs"]["save_csv"]):
         buh: pd.DataFrame = stats["gdf"].drop("geometry", axis=1)
         buh.to_csv(f"{output_name}-taps.csv", index=False)
-    if (CONFIG["outputs"]["show_plots"]):
-        plot_stats(stats, CONFIG)
+    if (CONFIG["outputs"]["show_plots"]) or (CONFIG["outputs"]["save_plots"]):
+        plot_stats(stats, 
+                   show_plots=CONFIG["outputs"]["show_plots"], 
+                   save_plots=CONFIG["outputs"]["save_plots"],
+                   output_file=output_name)

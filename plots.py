@@ -2,7 +2,7 @@
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-def plot_stats(stats, CONFIG):
+def plot_stats(stats, show_plots, save_plots, output_file):
     fig, axes = plt.subplots(ncols=2, nrows=1, figsize=(16, 8), facecolor="#009ddc")
     
     earliest_time = min(list(stats["journeys"].keys())).split("T")[0]
@@ -58,7 +58,6 @@ def plot_stats(stats, CONFIG):
     action_bars.grid(visible=True, which="both", axis="y")
     plt.xticks(rotation=45, ha="right")
 
-
     # bar chart of favourite places
     action_count_place_breakdown = {}
 
@@ -84,4 +83,7 @@ def plot_stats(stats, CONFIG):
 
     plt.tight_layout()
 
-    plt.show()
+    if save_plots:
+        plt.savefig(output_file+"-plot.png")
+    if show_plots:
+        plt.show()
