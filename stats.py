@@ -23,8 +23,6 @@ yaml_file = open("config.yaml")
 CONFIG = yaml.safe_load(yaml_file)
 yaml_file.close()
 
-STOPS_FILE = CONFIG["files"]["stops"]
-
 class Place():
     def __init__(self, stop_code, stop_id, proper_name, lat, long) -> None:
         # stop_id field included to be able to block stat calculation 
@@ -39,6 +37,8 @@ class Place():
         self.geometry = Point(long, lat)
 
 def load_stops():
+    STOPS_FILE = CONFIG["files"]["stops"]
+
     stops = {}
     csv_file = open(STOPS_FILE)
     dr = csv.DictReader(csv_file)
@@ -63,11 +63,6 @@ def load_tap_list(file_name):
     t_list = []
 
     for t in dr:
-    #     t["py_datetime"] = datetime.datetime.strptime(t["DateTime"], "%b-%d-%Y %I:%M %p")
-
-        
-        # could add a timezone but then DST must be accounted for :(
-        # t["DateTime"].tzinfo.utcoffset("-7")
         t_list.append(t)
 
     csv_file.close()
@@ -181,7 +176,7 @@ def calculate_stats(tap_list):
 
         # create a refined tap list with more useful fields
         new_tap = t
-        
+
         py_dt = datetime.datetime.strptime(t["DateTime"], "%b-%d-%Y %I:%M %p")
         new_tap["iso-datetime"] = py_dt.isoformat()
 
@@ -236,37 +231,38 @@ def calculate_stats(tap_list):
     stats["gdf"] = gpd.GeoDataFrame(data=stats["refined-taps"], geometry=gdf_geom, crs="EPSG:4326")
     return stats
 
-csv_files = CONFIG["files"]["csv"]
+if __name__ == "__main__":        
+    csv_files = CONFIG["files"]["csv"]
 
-all_stats = {}
+    all_stats = {}
 
-for c_f in csv_files:
-    taps = load_tap_list(c_f)
-    stats = calculate_stats(taps)
-    all_stats[c_f] = stats
+    for c_f in csv_files:
+        taps = load_tap_list(c_f)
+        stats = calculate_stats(taps)
+        all_stats[c_f] = stats
 
 
-    # # TODO: remove eventually
-    # print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
+        # # TODO: remove eventually
+        # print(f"{c_f}: {stats['actions']} {stats['money']} {stats['place-breakdown']}\n")
 
-    OUTPUT_DIR = CONFIG["output_dir"]
+        OUTPUT_DIR = CONFIG["output_dir"]
 
-    # remove original directory of data file from filename
-    output_name = os.path.split(c_f)[1]
-    # remove extension of original filename
-    output_name = os.path.splitext(output_name)[0]
-    
-    output_name = os.path.join(OUTPUT_DIR, output_name)
+        # remove original directory of data file from filename
+        output_name = os.path.split(c_f)[1]
+        # remove extension of original filename
+        output_name = os.path.splitext(output_name)[0]
+        
+        output_name = os.path.join(OUTPUT_DIR, output_name)
 
-    os.makedirs(OUTPUT_DIR, exist_ok=True)
-    
-    if (CONFIG["outputs"]["save_geojson"]):
-        stats["gdf"].to_file(f"{output_name}.geojson")
-    if (CONFIG["outputs"]["save_csv"]):
-        buh: pd.DataFrame = stats["gdf"].drop("geometry", axis=1)
-        buh.to_csv(f"{output_name}-taps.csv", index=False)
-    if (CONFIG["outputs"]["show_plots"]) or (CONFIG["outputs"]["save_plots"]):
-        plot_stats(stats, 
-                   show_plots=CONFIG["outputs"]["show_plots"], 
-                   save_plots=CONFIG["outputs"]["save_plots"],
-                   output_file=output_name)
+        os.makedirs(OUTPUT_DIR, exist_ok=True)
+
+        if (CONFIG["outputs"]["save_geojson"]):
+            stats["gdf"].to_file(f"{output_name}.geojson")
+        if (CONFIG["outputs"]["save_csv"]):
+            buh: pd.DataFrame = stats["gdf"].drop("geometry", axis=1)
+            buh.to_csv(f"{output_name}-taps.csv", index=False)
+        if (CONFIG["outputs"]["show_plots"]) or (CONFIG["outputs"]["save_plots"]):
+            plot_stats(stats, 
+                        show_plots=CONFIG["outputs"]["show_plots"],
+                        save_plots=CONFIG["outputs"]["save_plots"],
+                        output_file=output_name)
