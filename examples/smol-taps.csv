@@ -1,0 +1,79 @@
+DateTime,Transaction,Product,LineItem,Amount,BalanceDetails,JourneyId,LocationDisplay,TransactonTime,OrderDate,Payment,OrderNumber,AuthCode,Total,iso-datetime,action,stop_id,stop_code,proper_name,lat,long
+Sep-10-2023 03:56 PM,Transfer at Bus Stop 53312,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T21:33:00.0000000Z,"Transfer at Bus Stop 53312
+3 Zone UPass (N)",03:56 PM,,,,,,2023-09-10T15:56:00,Transfer,12681,53312,Burrard Station @ Bay 6,49.28616,-123.118293
+Sep-10-2023 03:18 PM,Tap out at Waterfront Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T21:33:00.0000000Z,"Tap out at Waterfront Stn
+3 Zone UPass (N)",03:18 PM,,,,,,2023-09-10T15:18:00,Tap out,12034,,Waterfront Station,49.285687,-123.111773
+Sep-10-2023 02:50 PM,Transfer at Sperling Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T21:33:00.0000000Z,"Transfer at Sperling Stn
+3 Zone UPass (N)",02:50 PM,,,,,,2023-09-10T14:50:00,Transfer,99923,,Sperling-Burnaby Lake Station,49.259195,-122.963998
+Sep-10-2023 02:33 PM,Tap in at Bus Stop 51864,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T21:33:00.0000000Z,"Tap in at Bus Stop 51864
+3 Zone UPass (N)",02:33 PM,,,,,,2023-09-10T14:33:00,Tap in,1878,51864,Westbound University Dr W @ W Campus Rd,49.281238,-122.928277
+Sep-09-2023 06:34 PM,Transfer at Bus Stop 59314,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T00:26:00.0000000Z,"Transfer at Bus Stop 59314
+3 Zone UPass (N)",06:34 PM,,,,,,2023-09-09T18:34:00,Transfer,10971,59314,Production Way Station @ Bay 1,49.253683,-122.918013
+Sep-09-2023 06:30 PM,Tap out at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T00:26:00.0000000Z,"Tap out at Production Way Stn
+3 Zone UPass (N)",06:30 PM,,,,,,2023-09-09T18:30:00,Tap out,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-09-2023 06:25 PM,Transfer at Lougheed Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T00:26:00.0000000Z,"Transfer at Lougheed Stn
+3 Zone UPass (N)",06:25 PM,,,,,,2023-09-09T18:25:00,Transfer,99926,,Lougheed Town Centre Station,49.248512,-122.896805
+Sep-09-2023 05:50 PM,Tap out at Lougheed Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T00:26:00.0000000Z,"Tap out at Lougheed Stn
+3 Zone UPass (N)",05:50 PM,,,,,,2023-09-09T17:50:00,Tap out,99926,,Lougheed Town Centre Station,49.248512,-122.896805
+Sep-09-2023 05:26 PM,Tap in at Royal Oak Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-10T00:26:00.0000000Z,"Tap in at Royal Oak Stn
+3 Zone UPass (N)",05:26 PM,,,,,,2023-09-09T17:26:00,Tap in,99942,,Royal Oak Station,49.220068,-122.98848
+Sep-09-2023 04:59 PM,Tap out at Royal Oak Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-09T22:28:00.0000000Z,"Tap out at Royal Oak Stn
+3 Zone UPass (N)",04:59 PM,,,,,,2023-09-09T16:59:00,Tap out,99942,,Royal Oak Station,49.220068,-122.98848
+Sep-09-2023 04:33 PM,Transfer at Renfrew Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-09T22:28:00.0000000Z,"Transfer at Renfrew Stn
+3 Zone UPass (N)",04:33 PM,,,,,,2023-09-09T16:33:00,Transfer,99918,,Renfrew Station,49.258913,-123.045379
+Sep-09-2023 03:57 PM,Tap out at Renfrew Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-09T22:28:00.0000000Z,"Tap out at Renfrew Stn
+3 Zone UPass (N)",03:57 PM,,,,,,2023-09-09T15:57:00,Tap out,99918,,Renfrew Station,49.258913,-123.045379
+Sep-09-2023 03:38 PM,Transfer at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-09T22:28:00.0000000Z,"Transfer at Production Way Stn
+3 Zone UPass (N)",03:38 PM,,,,,,2023-09-09T15:38:00,Transfer,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-09-2023 03:28 PM,Tap in at Bus Stop 51864,3 Zone UPass (N),,$0.00,$7.45,2023-09-09T22:28:00.0000000Z,"Tap in at Bus Stop 51864
+3 Zone UPass (N)",03:28 PM,,,,,,2023-09-09T15:28:00,Tap in,1878,51864,Westbound University Dr W @ W Campus Rd,49.281238,-122.928277
+Sep-07-2023 08:19 PM,Transfer at Bus Stop 59314,3 Zone UPass (N),,$0.00,$7.45,2023-09-08T01:51:00.0000000Z,"Transfer at Bus Stop 59314
+3 Zone UPass (N)",08:19 PM,,,,,,2023-09-07T20:19:00,Transfer,10971,59314,Production Way Station @ Bay 1,49.253683,-122.918013
+Sep-07-2023 08:12 PM,Tap out at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-08T01:51:00.0000000Z,"Tap out at Production Way Stn
+3 Zone UPass (N)",08:12 PM,,,,,,2023-09-07T20:12:00,Tap out,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-07-2023 08:07 PM,Transfer at Lougheed Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-08T01:51:00.0000000Z,"Transfer at Lougheed Stn
+3 Zone UPass (N)",08:07 PM,,,,,,2023-09-07T20:07:00,Transfer,99926,,Lougheed Town Centre Station,49.248512,-122.896805
+Sep-07-2023 07:08 PM,Tap out at Lougheed Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-08T01:51:00.0000000Z,"Tap out at Lougheed Stn
+3 Zone UPass (N)",07:08 PM,,,,,,2023-09-07T19:08:00,Tap out,99926,,Lougheed Town Centre Station,49.248512,-122.896805
+Sep-07-2023 07:03 PM,Transfer at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-08T01:51:00.0000000Z,"Transfer at Production Way Stn
+3 Zone UPass (N)",07:03 PM,,,,,,2023-09-07T19:03:00,Transfer,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-07-2023 06:51 PM,Tap in at Bus Stop 51863,3 Zone UPass (N),,$0.00,$7.45,2023-09-08T01:51:00.0000000Z,"Tap in at Bus Stop 51863
+3 Zone UPass (N)",06:51 PM,,,,,,2023-09-07T18:51:00,Tap in,1877,51863,SFU Transportation Centre @ Bay 1,49.279957,-122.920119
+Sep-05-2023 08:34 PM,Transfer at Bus Stop 59314,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T02:56:00.0000000Z,"Transfer at Bus Stop 59314
+3 Zone UPass (N)",08:34 PM,,,,,,2023-09-05T20:34:00,Transfer,10971,59314,Production Way Station @ Bay 1,49.253683,-122.918013
+Sep-05-2023 08:32 PM,Tap out at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T02:56:00.0000000Z,"Tap out at Production Way Stn
+3 Zone UPass (N)",08:32 PM,,,,,,2023-09-05T20:32:00,Tap out,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-05-2023 08:13 PM,Transfer at Moody Center Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T02:56:00.0000000Z,"Transfer at Moody Center Stn
+3 Zone UPass (N)",08:13 PM,,,,,,2023-09-05T20:13:00,Transfer,99928,,Moody Centre Station,49.278012,-122.846034
+Sep-05-2023 07:56 PM,Tap in at Bus Stop 58839,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T02:56:00.0000000Z,"Tap in at Bus Stop 58839
+3 Zone UPass (N)",07:56 PM,,,,,,2023-09-05T19:56:00,Tap in,9311,58839,Westbound Panorama Dr @ Parkway Blvd,49.297586,-122.809782
+Sep-05-2023 06:36 PM,Transfer at Bus Stop 59569,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T01:14:00.0000000Z,"Transfer at Bus Stop 59569
+3 Zone UPass (N)",06:36 PM,,,,,,2023-09-05T18:36:00,Transfer,12240,59569,Inlet Centre Station @ Bay 3,49.277099,-122.826771
+Sep-05-2023 06:31 PM,Tap out at Inlet Centre Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T01:14:00.0000000Z,"Tap out at Inlet Centre Stn
+3 Zone UPass (N)",06:31 PM,,,,,,2023-09-05T18:31:00,Tap out,99929,,Inlet Centre Station,49.27721,-122.828187
+Sep-05-2023 06:22 PM,Transfer at Burquitlam Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T01:14:00.0000000Z,"Transfer at Burquitlam Stn
+3 Zone UPass (N)",06:22 PM,,,,,,2023-09-05T18:22:00,Transfer,99927,,Burquitlam Station,49.261403,-122.889834
+Sep-05-2023 06:14 PM,Tap in at Bus Stop 51864,3 Zone UPass (N),,$0.00,$7.45,2023-09-06T01:14:00.0000000Z,"Tap in at Bus Stop 51864
+3 Zone UPass (N)",06:14 PM,,,,,,2023-09-05T18:14:00,Tap in,1878,51864,Westbound University Dr W @ W Campus Rd,49.281238,-122.928277
+Sep-02-2023 06:10 PM,Tap in at Bus Stop 59314,3 Zone UPass (N),,$0.00,$7.45,2023-09-03T01:10:00.0000000Z,"Tap in at Bus Stop 59314
+3 Zone UPass (N)",06:10 PM,,,,,,2023-09-02T18:10:00,Tap in,10971,59314,Production Way Station @ Bay 1,49.253683,-122.918013
+Sep-02-2023 05:57 PM,Tap out at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-02T23:27:00.0000000Z,"Tap out at Production Way Stn
+3 Zone UPass (N)",05:57 PM,,,,,,2023-09-02T17:57:00,Tap out,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-02-2023 05:51 PM,Transfer at Lougheed Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-02T23:27:00.0000000Z,"Transfer at Lougheed Stn
+3 Zone UPass (N)",05:51 PM,,,,,,2023-09-02T17:51:00,Transfer,99926,,Lougheed Town Centre Station,49.248512,-122.896805
+Sep-02-2023 04:40 PM,Tap out at Lougheed Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-02T23:27:00.0000000Z,"Tap out at Lougheed Stn
+3 Zone UPass (N)",04:40 PM,,,,,,2023-09-02T16:40:00,Tap out,99926,,Lougheed Town Centre Station,49.248512,-122.896805
+Sep-02-2023 04:35 PM,Transfer at Production Way Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-02T23:27:00.0000000Z,"Transfer at Production Way Stn
+3 Zone UPass (N)",04:35 PM,,,,,,2023-09-02T16:35:00,Transfer,99925,,Production Way-University Station,49.253416,-122.918223
+Sep-02-2023 04:27 PM,Tap in at Bus Stop 51864,3 Zone UPass (N),,$0.00,$7.45,2023-09-02T23:27:00.0000000Z,"Tap in at Bus Stop 51864
+3 Zone UPass (N)",04:27 PM,,,,,,2023-09-02T16:27:00,Tap in,1878,51864,Westbound University Dr W @ W Campus Rd,49.281238,-122.928277
+Sep-01-2023 11:26 AM,Tap out at Burrard Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-01T18:04:00.0000000Z,"Tap out at Burrard Stn
+3 Zone UPass (N)",11:26 AM,,,,,,2023-09-01T11:26:00,Tap out,99933,,Burrard Station,49.285614,-123.119557
+Sep-01-2023 11:04 AM,Tap in at Commercial Drive Stn,3 Zone UPass (N),,$0.00,$7.45,2023-09-01T18:04:00.0000000Z,"Tap in at Commercial Drive Stn
+3 Zone UPass (N)",11:04 AM,,,,,,2023-09-01T11:04:00,Tap in,99917,,Commercial-Broadway Station,49.26267,-123.068765
+Aug-31-2023 12:38 PM,Tap in at Bus Stop 52094,Stored Value,,-$2.55,$7.45,2023-08-31T19:38:00.0000000Z,"Tap in at Bus Stop 52094
+Stored Value",12:38 PM,,,,,,2023-08-31T12:38:00,Tap in,11589,52094,Commercial-Broadway Station @ Bay 4,49.262426,-123.069432
+Aug-31-2023 12:38 PM,Loaded at Bus Stop 52094,3 Zone UPass (N),,$0.00,$10.00,,"Loaded at Bus Stop 52094
+3 Zone UPass (N)",12:38 PM,,,,,,2023-08-31T12:38:00,Loaded,11589,52094,Commercial-Broadway Station @ Bay 4,49.262426,-123.069432
+Aug-30-2023 07:59 PM,Purchase at Commercial Drive Stn,Stored Value,,$10.00,$10.00,,"Purchase at Commercial Drive Stn
+Stored Value",07:59 PM,,,,,,2023-08-30T19:59:00,Purchase,99917,,Commercial-Broadway Station,49.26267,-123.068765
