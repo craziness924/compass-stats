@@ -135,6 +135,10 @@ def get_action_and_place(s: str) -> tuple[str, Place]:
     # purchased card at the translink customer service centre, use that location
     elif "Purchase" in s and "WalkIn Centre" in s:
         return ("Purchase", Place(None, None, "Customer Service Centre", lat=49.28557, long=-123.11171))
+    elif "Web Order" in s:
+        return ("Purchase", Place(None, None, "Internet", lat=49.28557, long=-123.11171))
+    elif "AutoLoaded" in s:
+        return("Loaded", Place(None, None, "Internet", lat=49.28557, long=-123.11171))
     
     place: Place = geolocate_place(split[1])
 
@@ -189,16 +193,11 @@ def calculate_stats(tap_list):
         new_tap["lat"] = place.lat
         new_tap["long"] = place.long
 
+        new_tap["zone_id"] = t
+
         gdf_geom.append(place.geometry)
         
         stats["refined-taps"].append(new_tap)
-
-        # setup journeys
-
-        # "loaded" and "purchased" action doesn't have a JourneyId associated, ignore it
-        if action not in ["Loaded", "Purchase"]:
-            stats["journeys"].setdefault(t["JourneyId"], [])
-            stats["journeys"][t["JourneyId"]].append(new_tap)
 
         # setup place breakdown
         stats["place-breakdown"].setdefault(place.proper_name, {})
@@ -216,9 +215,11 @@ def calculate_stats(tap_list):
         else:
             amnt = float(amnt[1])
 
+        tap_expenditure = 0
         # spent amounts are expressed as negative in the Compass csv export
         if amnt < 0:
-            stats["money"]["spent"] += amnt*-1
+            tap_expenditure = amnt
+            stats["money"]["spent"] += tap_expenditure
         if amnt > 0:
             # money was genuinely loaded via payment
             if action == "Purchase" or action == "Loaded":
@@ -226,8 +227,25 @@ def calculate_stats(tap_list):
             # money was refunded for a trip at tap out time
             # this is necessary because Compass reserves money for full trip ahead of time
             elif action == "Tap out":
+                tap_expenditure += -amnt
                 stats["money"]["spent"] += -amnt
-                pass
+
+        # "loaded" and "purchased" action doesn't have a JourneyId associated, ignore it
+        if action not in ["Loaded", "Purchase"]:
+            stats["journeys"].setdefault(t["JourneyId"], {})
+
+            journey = stats["journeys"][t["JourneyId"]]
+
+            journey.setdefault("taps", [])
+            journey["taps"].append(new_tap)
+
+            # the amount that was actually spent on this journey, according to Compass
+            journey["actualSpend"] = tap_expenditure
+
+            # the amount that this app thinks the journey should've cost
+            #journey["calculatedSpend"] = 0
+            pass
+        
     stats["gdf"] = gpd.GeoDataFrame(data=stats["refined-taps"], geometry=gdf_geom, crs="EPSG:4326")
     return stats
 

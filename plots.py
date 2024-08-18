@@ -2,11 +2,23 @@
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
+import datetime
+
 def plot_stats(stats, show_plots, save_plots, output_file):
     fig, axes = plt.subplots(ncols=2, nrows=1, figsize=(16, 8), facecolor="#009ddc")
     
-    earliest_time = min(list(stats["journeys"].keys())).split("T")[0]
-    latest_time = max(list(stats["journeys"].keys())).split("T")[0]
+    dates_travelled = []
+
+    for d in list(stats["journeys"].keys()):
+        d = d.replace("Z", "")
+        d = d.replace("T", " ")
+        d = d.split(".")[0]
+
+        dt = datetime.datetime.fromisoformat(d)
+        dates_travelled.append(dt)
+
+    earliest_time: datetime.datetime = min(dates_travelled)
+    latest_time: datetime.datetime = max(dates_travelled)
 
     fig.suptitle(f"Compass Card Stats from {earliest_time} to {latest_time}", 
                  color="White", size=28, font="Liberation Sans", fontweight="bold")
