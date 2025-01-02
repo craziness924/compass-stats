@@ -2,11 +2,37 @@
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 
-def plot_stats(stats, show_plots, save_plots, output_file):
+import datetime
+
+# takes a sorted list and finds the last index that meets the cutoff value
+
+# if no values make the cutoff value, then an index of -1 is returned
+# if all values make the cutoff value, then the last valid index of the list is returned
+
+# values: sorted list of integers
+# cutoff: minimum value 
+def find_index_of_min_cutoff(values: list[int], cutoff: int) -> int:
+    for i, v in enumerate(values):
+        if v<cutoff:
+            return i-1
+    
+    return len(values)-1
+
+def plot_stats(stats, show_plots, save_plots, output_file, min_actions_to_show=-1):
     fig, axes = plt.subplots(ncols=2, nrows=1, figsize=(16, 8), facecolor="#009ddc")
     
-    earliest_time = min(list(stats["journeys"].keys())).split("T")[0]
-    latest_time = max(list(stats["journeys"].keys())).split("T")[0]
+    dates_travelled = []
+
+    for d in list(stats["journeys"].keys()):
+        d = d.replace("Z", "")
+        d = d.replace("T", " ")
+        d = d.split(".")[0]
+
+        dt = datetime.datetime.fromisoformat(d)
+        dates_travelled.append(dt)
+
+    earliest_time: datetime.datetime = min(dates_travelled)
+    latest_time: datetime.datetime = max(dates_travelled)
 
     fig.suptitle(f"Compass Card Stats from {earliest_time} to {latest_time}", 
                  color="White", size=28, font="Liberation Sans", fontweight="bold")
@@ -26,7 +52,7 @@ def plot_stats(stats, show_plots, save_plots, output_file):
     # calculate numbers to display in a text box
     actions, action_nums = stats["actions"].keys(), stats["actions"].values()
 
-    tap_count = stats["actions"].get("Tap in", 0)+ stats["actions"].get("Tap out", 0) + stats["actions"].get("Transfer", 0)
+    tap_count = stats["actions"].get("Tap in", 0) + stats["actions"].get("Tap out", 0) + stats["actions"].get("Transfer", 0)
     
     place_count = len(stats["place-breakdown"])
 
@@ -39,7 +65,7 @@ def plot_stats(stats, show_plots, save_plots, output_file):
     ab_bbox = action_bars.get_position()
     fig.text(x=ab_bbox.min[0]-0.089, y=ab_bbox.min[1], s=f"You tapped {tap_count} times in {place_count} unique places\nand missed {missed_count} tap out(s) \
              \n\nYour card was loaded {load_count} times (${load_amount:.2f}) and \
-             \nyou spent ${spent_amount:.2f} on fares",
+             \nyou spent ${-spent_amount:.2f} on fares",
              fontdict={
                  "family": "sans serif",
                  "color": "black",
@@ -74,6 +100,13 @@ def plot_stats(stats, show_plots, save_plots, output_file):
     # magic don't ask :(
     sorted_labels = sorted(action_count_place_breakdown, reverse=True, key=action_count_place_breakdown.get)
     
+    # the action count will never be below zero
+    if min_actions_to_show >= 0:
+        index_of_min_cutoff=find_index_of_min_cutoff(sorted_counts, min_actions_to_show)
+
+        sorted_counts = sorted_counts[:index_of_min_cutoff]
+        sorted_labels = sorted_labels[:index_of_min_cutoff]
+
     place_bars.bar(x=sorted_labels, height=sorted_counts)
     place_bars.set_title("Favourite Places by Action Count\n(excluding Purchasing and Loading)", fontdict=subplot_title_font_dict)
     place_bars.xaxis.label.set_fontsize(4.0)
