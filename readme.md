@@ -34,6 +34,8 @@ This project uses the CSV export from the Compass Card website to gather statist
 
 **hidden places**: An array of `stop_id` (the first field in the stops.txt file) that will be skipped during stat calculation, incase you frequent a certain stop. Bus exchanges have unique stop_id values for each bus bay, so make sure to hide all of them if you want to hide the entire bus exchange
 
+**minimum_action_count_to_show**: The number of actions that a place needs to be shown on the "favourite places by action count" plot
+
 <h4>file</h4>
 
 Using absolute file paths (on Windows) appears to cause issues, try to use relative paths by putting your files in the `data` folder
