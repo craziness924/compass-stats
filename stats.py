@@ -24,7 +24,7 @@ CONFIG = yaml.safe_load(yaml_file)
 yaml_file.close()
 
 class Place():
-    def __init__(self, stop_code, stop_id, proper_name, lat, long) -> None:
+    def __init__(self, stop_code, stop_id, proper_name, lat, long, zone_id) -> None:
         # stop_id field included to be able to block stat calculation 
         # of taps at hidden stations since all tappable places have a stop_id
         self.stop_id = stop_id
@@ -33,6 +33,8 @@ class Place():
         self.proper_name = proper_name
         self.lat = lat
         self.long = long
+
+        self.zone_id: str = zone_id
         
         self.geometry = Point(long, lat)
 
@@ -81,11 +83,12 @@ def geolocate_place(name: str) -> Place:
             proper_name = STOPS_LIST[stop_code]["stop_name"]
             lat = STOPS_LIST[stop_code]["stop_lat"]
             long = STOPS_LIST[stop_code]["stop_lon"]
+            zone_id = STOPS_LIST[stop_code]["zone_id"]
 
-            place = Place(stop_code, stop_id, proper_name, lat, long)
+            place = Place(stop_code, stop_id, proper_name, lat, long, zone_id)
         except KeyError:
             print(f"Error finding {name}! (couldn't find stop_code in stops.txt)")
-            place = Place(-1, -1, "N/A", lat=0, long=0)
+            place = Place(-1, -1, "N/A", lat=0, long=0, zone_id="N/A")
         return place
     # we're dealing with a station tap
     elif "Stn" in name or "Station" or "Quay" in name:
@@ -116,14 +119,14 @@ def geolocate_place(name: str) -> Place:
             if v["parent_station"] != '':
                 continue
 
-            place = Place(stop_code=None, stop_id=v["stop_id"], proper_name=v["stop_name"], lat=v["stop_lat"], long=v["stop_lon"])
+            place = Place(stop_code=None, stop_id=v["stop_id"], proper_name=v["stop_name"], lat=v["stop_lat"], long=v["stop_lon"], zone_id=v["zone_id"])
             return place
         else:
             print(f"Couldn't find {name} station!")
-            return Place(-1, -1, "N/A", 0, 0)
+            return Place(-1, -1, "N/A", 0, 0, zone_id=None)
     else:
         print(f"Don't know how to parse {name}! (couldn't classify it as a bus stop or station)")
-        return Place(-1, -1, "N/A", 0, 0)
+        return Place(-1, -1, "N/A", 0, 0, zone_id=None)
 
 # given a "Transaction" string, return the action, place, and geometry
 def get_action_and_place(s: str) -> tuple[str, Place]:
@@ -131,10 +134,14 @@ def get_action_and_place(s: str) -> tuple[str, Place]:
 
     # no reasonable place to put a missed tap out, put it at point null
     if s == "Missing Tap out":
-        return ("Missed Tap Out", Place(None, None, "N/A", lat=0, long=0))
+        return ("Missed Tap Out", Place(None, None, "N/A", lat=0, long=0, zone_id=None))
     # purchased card at the translink customer service centre, use that location
     elif "Purchase" in s and "WalkIn Centre" in s:
-        return ("Purchase", Place(None, None, "Customer Service Centre", lat=49.28557, long=-123.11171))
+        return ("Purchase", Place(None, None, "Customer Service Centre", lat=49.28557, long=-123.11171, zone_id=None))
+    elif "Web Order" in s:
+        return ("Purchase", Place(None, None, "Internet", lat=49.28557, long=-123.11171, zone_id=None))
+    elif "AutoLoaded" in s:
+        return("Loaded", Place(None, None, "Internet", lat=49.28557, long=-123.11171, zone_id=None))
     
     place: Place = geolocate_place(split[1])
 
@@ -189,16 +196,11 @@ def calculate_stats(tap_list):
         new_tap["lat"] = place.lat
         new_tap["long"] = place.long
 
+        new_tap["zone_id"] = place.zone_id
+
         gdf_geom.append(place.geometry)
         
         stats["refined-taps"].append(new_tap)
-
-        # setup journeys
-
-        # "loaded" and "purchased" action doesn't have a JourneyId associated, ignore it
-        if action not in ["Loaded", "Purchase"]:
-            stats["journeys"].setdefault(t["JourneyId"], [])
-            stats["journeys"][t["JourneyId"]].append(new_tap)
 
         # setup place breakdown
         stats["place-breakdown"].setdefault(place.proper_name, {})
@@ -216,9 +218,11 @@ def calculate_stats(tap_list):
         else:
             amnt = float(amnt[1])
 
+        tap_expenditure = 0
         # spent amounts are expressed as negative in the Compass csv export
         if amnt < 0:
-            stats["money"]["spent"] += amnt*-1
+            tap_expenditure = amnt
+            stats["money"]["spent"] += tap_expenditure
         if amnt > 0:
             # money was genuinely loaded via payment
             if action == "Purchase" or action == "Loaded":
@@ -226,8 +230,25 @@ def calculate_stats(tap_list):
             # money was refunded for a trip at tap out time
             # this is necessary because Compass reserves money for full trip ahead of time
             elif action == "Tap out":
+                tap_expenditure += -amnt
                 stats["money"]["spent"] += -amnt
-                pass
+
+        # "loaded" and "purchased" action doesn't have a JourneyId associated, ignore it
+        if action not in ["Loaded", "Purchase"]:
+            stats["journeys"].setdefault(t["JourneyId"], {})
+
+            journey = stats["journeys"][t["JourneyId"]]
+
+            journey.setdefault("taps", [])
+            journey["taps"].append(new_tap)
+
+            # # the amount that was actually spent on this journey, according to Compass
+            # journey["actualSpend"] = tap_expenditure
+
+            # # the amount that this app thinks the journey should've cost
+            # #journey["calculatedSpend"] = 0
+            # pass
+        
     stats["gdf"] = gpd.GeoDataFrame(data=stats["refined-taps"], geometry=gdf_geom, crs="EPSG:4326")
     return stats
 
@@ -265,4 +286,5 @@ if __name__ == "__main__":
             plot_stats(stats, 
                         show_plots=CONFIG["outputs"]["show_plots"],
                         save_plots=CONFIG["outputs"]["save_plots"],
-                        output_file=output_name)
+                        output_file=output_name,
+                        min_actions_to_show=CONFIG["minimum_action_count_to_show"])

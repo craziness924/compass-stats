@@ -11,6 +11,10 @@ hidden-places:
     # 99945 # new westminster skytrain station
   ]
 
+# sets the number of actions required for a particular
+# favourite place to appear in the final plot
+minimum_action_count_to_show: 15
+
 files: 
   # the Compass Card CSV export files of interest,
   # the program will process all csv files given here at once
