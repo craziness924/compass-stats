@@ -33,6 +33,18 @@ def plot_stats(stats, show_plots, save_plots, output_file, min_actions_to_show=-
 
     earliest_time: datetime.datetime = min(dates_travelled)
     latest_time: datetime.datetime = max(dates_travelled)
+    dates_travelled = []
+
+    for d in list(stats["journeys"].keys()):
+        d = d.replace("Z", "")
+        d = d.replace("T", " ")
+        d = d.split(".")[0]
+
+        dt = datetime.datetime.fromisoformat(d)
+        dates_travelled.append(dt)
+
+    earliest_time: datetime.datetime = min(dates_travelled)
+    latest_time: datetime.datetime = max(dates_travelled)
 
     fig.suptitle(f"Compass Card Stats from {earliest_time} to {latest_time}", 
                  color="White", size=28, font="Liberation Sans", fontweight="bold")
